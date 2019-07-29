@@ -1,3 +1,6 @@
 require_relative '../config/environment'
 
-puts "hello world"
+cli = Interface.new
+
+#### START PROGRAM ####
+cli.login
