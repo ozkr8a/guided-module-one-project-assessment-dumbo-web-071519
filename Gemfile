@@ -11,3 +11,9 @@ gem "require_all"
 gem "faker"
 gem "tty-prompt"
 gem "colorize"
+gem 'docopt'
+gem 'rmagick'
+gem 'ruby-terminfo'
+gem 'tco'
+gem 'catpix'
+gem 'gif'

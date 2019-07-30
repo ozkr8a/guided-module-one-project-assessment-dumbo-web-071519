@@ -1,11 +1,3 @@
-
-# TO DO:
-# 1) change 'search_menu' function to 'search_menu'
-# 2) make new 'main menu' have options to
-# ==> a) update account -> (*new function)
-# ===> b) see order history -> (*new function)
-# ====> c) start new order -> search_menu()
-
 require_relative '../config/environment'
 
 class Interface
@@ -16,9 +8,21 @@ class Interface
     @customer = {}
   end
 
+  def run_catpix
+    Catpix::print_image "clink2.jpg",
+      :limit_x => 0.4,
+      :limit_y => 1,
+      :center_x => true,
+      :center_y => true,
+      :bg => "black",
+      :bg_fill => true,
+      :resolution => "high"
+  end
+
   def login
     # pid = fork{ exec "afplay", "pp_theme.mp3" }
-    system "clear"
+    # system "clear"
+    run_catpix()
     prompt.select("LOGIN OR CREATE A NEW ACCOUNT".light_green.bold) do |menu|
       menu.choice "LOGIN", -> {old_customer()}
       menu.choice "CREATE ACCOUNT", -> {new_customer()}
@@ -50,7 +54,96 @@ class Interface
       prompt.say("WELCOME BACK #{@customer[:name]}! 🍻".upcase.yellow.italic)
       #other better ways to do this...? #
       sleep(1.5)
+      main_menu()
+    end
+  end
+
+  def main_menu
+    prompt.select("MAIN MENU") do |menu|
+      menu.choice "UPDATE ACCOUNT", -> {update_account()}
+      menu.choice "SEE ORDER HISTORY", -> {order_history()}
+      menu.choice "PLACE NEW ORDER", -> {search_menu()}
+      menu.choice "DELETE ACCOUNT", -> {delete_account()}
+    end
+  end
+
+  def update_account
+    prompt.select("WHAT ACCOUNT INFO WOULD YOU LIKE TO UPDATE?") do |menu|
+      menu.choice "NAME", -> {update_handler("name")}
+      menu.choice "EMAIL", -> {update_handler("email")}
+      menu.choice "ZIP CODE", -> {update_handler("zip")}
+    end
+    #Customer.find(@customer.id).update(name: name)
+    #prompt.select("PLEASE CHOOSE AN ORDER TO RE-ORDER: ")
+  end
+
+  def update_handler(column)
+    new_value = prompt.ask("WHAT WOULD YOU LIKE YOUR NEW #{column} TO BE?".upcase)
+
+    Customer.find(@customer.id).update("#{column}": new_value)
+
+    prompt.say("YOU'VE SUCCESFULLY CHANGED YOUR #{column} to #{new_value}")
+
+
+    sleep(1.5)
+    prompt.say("TAKING YOU BACK TO MAIN MENU...")
+    main_menu()
+  end
+
+  def order_history
+    #
+    # list_of_orders = Order.where(customer_id: self.customer.id).pluck(:id).map do |order_id|
+    #   Order.find(order_id)
+    # end
+    #
+    # list_of_stores = list_of_orders.map do |order|
+    #   Store.find(order.store_id)
+    # end
+    # list_of_order_prices = Order.where(customer_id: self.customer.id).pluck(:price)
+    # list_of_order_products = Order.where(customer_id: self.customer.id).pluck(:product)
+    # list_of_store_names = list_of_stores.map do |store|
+    #   store.name
+    # end
+    #
+    # old_order_strings_array = []
+    #
+    # i=0
+    # while (i < list_of_stores.count)
+    #   old_order_strings_array << "Your order from #{list_of_store_names[i]} of #{list_of_order_products[i]} for $#{list_of_order_prices[i]}."
+    #   i+=1
+    # end
+    #
+    # # Turn array into 'option_hash' => (k=string, v=function)
+    # # Pass option_hash as arg to tty-prompt
+    # old_order_strings_hash = {}
+    # binding.pry
+    #
+    # old_order_strings_array.map do |order_string|
+    #   old_order_strings_hash[order_string] = x[]
+    # end
+    # binding.pry
+    # old_order_strings_hash["BACK"] = 0
+    #
+    # reorder_order = prompt.select("HERE ARE YOUR OLD ORDERS. CHOOSE ONE TO RE-ORDER IT!", old_order_strings_hash)
+    #
+    # store_name = ""
+    # binding.pry
+    # reorder_order_array = reorder_order.split
+    # if reorder_order_array.count == 9
+    #   store_name = "#{reorder_order_array[3]} #{reorder_order_array[4]}"
+    # else # reorder_order_array.count == 8
+    #   store_name = reorder_order_array[3]
+    # end
+    # checkout_store = Store.find_by(name: store_name)
+    "order history"
+  end
+
+  def reorder_handler
+    case order
+    when 0
       search_menu()
+    when 1
+      check_out(checkout_store)
     end
   end
 
@@ -61,6 +154,22 @@ class Interface
       menu.choice "SEARCH BY ZIP CURRENT CODE", -> {zip_search()}
       menu.choice "SEARCH BY LIQUOR", -> {liquor_search()}
       menu.choice "LOGIN AS A DIFFERENT CUSTOMER", -> {login()}
+    end
+  end
+
+  def delete_account
+    confirm_destroy = prompt.yes?("ARE YOU SURE?".red.bold)
+    if confirm_destroy
+      Customer.find_by(name: @customer.name).destroy
+      sleep(0.5)
+      prompt.say("HASTA LA VISTA BABY...'ALL BEE BACK'...☠️".red.italic)
+      sleep(1.5)
+      prompt.say("TAKING YOU BACK TO LOGIN...")
+      sleep(1)
+      login()
+    else
+      prompt.say("TAKING YOU BACK TO MAIN MENU".green.italic)
+      main_menu()
     end
   end
 
