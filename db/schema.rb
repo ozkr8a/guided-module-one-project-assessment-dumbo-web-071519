@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_29_204136) do
+ActiveRecord::Schema.define(version: 2019_07_30_014647) do
 
   create_table "customers", force: :cascade do |t|
     t.string "name"
@@ -22,7 +22,7 @@ ActiveRecord::Schema.define(version: 2019_07_29_204136) do
     t.integer "customer_id"
     t.integer "store_id"
     t.float "price"
-    t.string "products"
+    t.string "product"
   end
 
   create_table "stores", force: :cascade do |t|

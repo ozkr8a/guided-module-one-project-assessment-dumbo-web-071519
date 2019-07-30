@@ -13,14 +13,18 @@ GEM
       minitest (~> 5.1)
       tzinfo (~> 1.1)
     arel (9.0.0)
+    binding_of_caller (0.8.0)
+      debug_inspector (>= 0.0.1)
     coderay (1.1.2)
     colorize (0.8.1)
     concurrent-ruby (1.1.5)
+    debug_inspector (0.0.3)
     equatable (0.6.1)
     faker (1.9.6)
       i18n (>= 0.7)
     i18n (1.6.0)
       concurrent-ruby (~> 1.0)
+    interception (0.5)
     method_source (0.9.2)
     minitest (5.11.3)
     mustermann (1.0.3)
@@ -31,6 +35,14 @@ GEM
     pry (0.12.2)
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
+    pry-nav (0.3.0)
+      pry (>= 0.9.10, < 0.13.0)
+    pry-rescue (1.5.0)
+      interception (>= 0.5)
+      pry (>= 0.12.0)
+    pry-stack_explorer (0.4.9.3)
+      binding_of_caller (>= 0.7)
+      pry (>= 0.9.11)
     rack (2.0.7)
     rack-protection (2.0.5)
       rack
@@ -68,6 +80,9 @@ DEPENDENCIES
   colorize
   faker
   pry
+  pry-nav
+  pry-rescue
+  pry-stack_explorer
   require_all
   sinatra-activerecord
   sqlite3
