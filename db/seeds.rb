@@ -5,73 +5,155 @@ Order.destroy_all
 
 
 ######## CUSTOMERS ########
-c1 = Customer.create(
+Customer.create(
   name: "Chris",
   email: "test",
-  zip: 4
+  zip: 4,
+  abv: 0.0,
 )
-c2 = Customer.create(
+Customer.create(
   name: "Carl",
-  email: "cust2@cust.com",
-  zip: 2
+  email: "cust2",
+  zip: 2,
+  abv: 0.0
 )
-c3 = Customer.create(
+Customer.create(
   name: "Jenny",
-  email: "cust3@cust.com",
-  zip: 3
+  email: "cust3",
+  zip: 3,
+  abv: 0.0
 )
-c4 = Customer.create(
+Customer.create(
   name: "Santa",
   email: "liqur_luvr@npole.com",
-  zip: 1
+  zip: 2,
+  abv: 0.0
 )
-
+Customer.create(
+  name: "Santa",
+  email: "liqur_luvr@npole.com",
+  zip: 4,
+  abv: 0.0
+)
+Customer.create(
+  name: "Santa",
+  email: "liqur_luvr@npole.com",
+  zip: 1,
+  abv: 0.0
+)
 ######## STORES ########
-s1 = Store.create(
+Store.create(
   name: "Drunk Clam",
   rating: 5,
   zip: 4,
   specialty: "vodka"
 )
-s2 = Store.create(name: "Roscoe's",rating: 4,
-  zip: 3,
-  specialty: "rum"
-)
-s3 = Store.create(name: "Flatiron Keg",
+Store.create(
+  name: "Flatiron Keg",
   rating: 1,
   zip: 2,
   specialty: "rum"
 )
-s4 = Store.create(name: "BeerBox",
+Store.create(
+  name: "BeerBox",
   rating: 5,
   zip: 2,
   specialty: "vodka"
 )
-s5 = Store.create(name: "BeerBox2",
+Store.create(
+  name: "The Bada Bing (The Sopranos)",
   rating: 4,
   zip: 1,
   specialty: "tequila"
 )
-s6 = Store.create(name: "BeerBox3",
+Store.create(
+  name: "MacLaren's Pub (How I Met Your Mother)",
   rating: 5,
   zip: 4,
   specialty: "tequila"
 )
-
+Store.create(
+  name: "The Lusty Leopard (How I Met Your Mother)",
+  rating: 10,
+  zip: 3,
+  specialty: "Vodka"
+)
+Store.create(
+  name: "Dorsia (American Psycho)",
+  rating: 3,
+  zip: 1,
+  specialty: "tequila"
+)
+Store.create(
+  name: "Electric Psychedelic Pussycat Swingers Club (Austin Powers)",
+  rating: 7,
+  zip: 2,
+  specialty: "rum"
+)
+Store.create(
+  name: "The Delancy (168 Delancey St, New York, NY 10002)",
+  rating: 9,
+  zip: 4,
+  specialty: "tequila"
+)
+Store.create(
+  name: "The Hog's Head (Harry Potter)",
+  rating: 5,
+  zip: 1,
+  specialty: "vodka"
+)
+Store.create(
+  name: "Korova Milk Bar (A Clockwork Orange)",
+  rating: 2,
+  zip: 2,
+  specialty: "vodka"
+)
+Store.create(
+  name: "Paddy's Pub (Always Sunny in Philadelphia)",
+  rating: 7,
+  zip: 4,
+  specialty: "rum"
+)
+Store.create(
+  name: "The Nomad (1170 Broadway, New York, NY 10001)",
+  rating: 8,
+  zip: 3,
+  specialty: "rum"
+)
 ######## ORDERS ########
-o1 = Order.create(
+Order.create(
   customer_id: Customer.first.id,
   store_id: Store.first.id
 )
-o2 = Order.create(
+Order.create(
   customer_id: Customer.second.id,
   store_id: Store.second.id
 )
-o3 = Order.create(
+Order.create(
   customer_id: Customer.third.id,
   store_id: Store.third.id
 )
-o4 = Order.create(
-  customer_id: Customer.fourth.id,
-  store_id: Store.fourth.id
+Order.create(
+  customer_id: Customer.take.id,
+  store_id: Store.take.id
+)
+Order.create(
+  customer_id: Customer.take.id,
+  store_id: Store.take.id
+)
+Order.create(
+  customer_id: Customer.take.id,
+  store_id: Store.take.id
+)
+Order.create(
+  customer_id: Customer.take.id,
+  store_id: Store.take.id
+)
+Order.create(
+  customer_id: Customer.take.id,
+  store_id: Store.take.id
+)
+Order.create(
+  customer_id: Customer.take.id,
+  store_id: Store.take.id
 )

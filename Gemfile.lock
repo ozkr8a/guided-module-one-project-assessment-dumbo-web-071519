@@ -1,7 +1,6 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    RubyDataStructures (1.1.0)
     activemodel (5.2.3)
       activesupport (= 5.2.3)
     activerecord (5.2.3)
@@ -79,6 +78,8 @@ GEM
       sinatra (>= 1.0)
     sqlite3 (1.4.1)
     tco (0.1.8)
+    terminal-table (1.8.0)
+      unicode-display_width (~> 1.1, >= 1.1.1)
     thread_safe (0.3.6)
     tilt (2.0.9)
     tty-color (0.5.0)
@@ -97,13 +98,13 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.6)
+    unicode-display_width (1.6.0)
     wisper (2.0.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  RubyDataStructures
   catpix
   colorize
   docopt
@@ -120,6 +121,7 @@ DEPENDENCIES
   sinatra-activerecord
   sqlite3
   tco
+  terminal-table
   tty-prompt
 
 BUNDLED WITH

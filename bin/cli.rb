@@ -39,8 +39,8 @@ class Interface
 
   def login
     # pid = fork{ exec "afplay", "pp_theme.mp3" }
-    # system "clear"
-    run_catpix()
+    # run_catpix()
+    system "clear"
     prompt.select("==> LOGIN OR CREATE A NEW ACCOUNT".light_green.bold) do |menu|
       menu.choice "LOGIN", -> {old_customer()}
       menu.choice "CREATE ACCOUNT", -> {new_customer()}
@@ -56,6 +56,8 @@ class Interface
       key(:email).ask('EMAIL?')
       key(:zip).ask('ZIP CODE?', convert: :int)
     end
+
+    customer_hash[:bac] = 0.0
 
     @customer = Customer.create(customer_hash)
 
@@ -80,10 +82,17 @@ class Interface
 
 
   def main_menu
+    system "clear"
+    @customer.reload()
+    show_user_session_details()
     prompt.select("==> MAIN MENU".light_green.bold) do |menu|
       menu.choice "UPDATE ACCOUNT", -> {update_account()}
       menu.choice "SEE ORDER HISTORY", -> {order_history()}
-      menu.choice "PLACE NEW ORDER", -> {search_menu()}
+      if @customer.bac <= 1.5
+        menu.choice "PLACE NEW ORDER", -> {search_menu()}
+      else
+        menu.choice name: "PLACE NEW ORDER", disabled: "(your BAC is way too damn high)"
+      end
       menu.choice "DELETE ACCOUNT", -> {delete_account()}
       menu.choice "LOGOUT", -> {login()}
     end
@@ -91,6 +100,8 @@ class Interface
 
 
   def update_account
+    system "clear"
+    show_user_session_details()
     prompt.select("==> WHAT ACCOUNT INFO WOULD YOU LIKE TO UPDATE?".light_green.bold) do |menu|
       menu.choice "NAME", -> {update_handler("name")}
       menu.choice "EMAIL", -> {update_handler("email")}
@@ -111,6 +122,11 @@ class Interface
 
 
   def order_history
+    show_user_session_details()
+    @customer.reload
+    # @customer.orders.each do |order|
+    #   order.reload
+    # end
     list_of_orders = @customer.orders
     list_of_order_prices = Order.where(customer_id: self.customer.id).pluck(:price)
     list_of_order_products = Order.where(customer_id: self.customer.id).pluck(:product)
@@ -122,7 +138,7 @@ class Interface
     old_order_strings_array = []
 
     i=0
-    while (i < list_of_stores.count)
+    while (i < list_of_orders.count)
       old_order_strings_array << "==> Your order from #{list_of_store_names[i]} of #{list_of_order_products[i]} for $#{list_of_order_prices[i]}.".upcase
       i+=1
     end
@@ -131,23 +147,25 @@ class Interface
       string.slice(4..-1)
     end
 
-    processed_old_order_strings_array << "BACK"
-
     # =====> ORDER ARRAY TO HASH (K=array entry, V=store_instance) <=====
     # ===================================================================
     old_order_hash = {}
     j=0
     processed_old_order_strings_array.each do |string|
+      string = "(#{j+1}) #{string}"
       old_order_hash[string] = list_of_orders[j]
       j+=1
     end
     # ===========================>  END  <===============================
+
+    old_order_hash["BACK"] = "BACK"
 
     reorder_order_selection = prompt.select("==> HERE ARE YOUR OLD ORDERS. CHOOSE ONE TO RE-ORDER IT!".light_green.bold, old_order_hash.keys)
 
     re_order_handler(old_order_hash, reorder_order_selection)
 
   end
+
 
   def re_order_handler(order_hash, selection)
     if selection == "BACK"
@@ -157,28 +175,35 @@ class Interface
     end
   end
 
+
   def re_order(order_hash, selection)
     confirm_selection = prompt.yes?("ARE YOU SURE YOU WANT TO RE-ORDER #{selection}".upcase.light_yellow.bold)
     if confirm_selection
-      binding.pry
-      Order.create(customer_id: order_hash[selection].customer_id, store_id: order_hash[selection].store_id, price: order_hash[selection].price, product: order_hash[selection].product)
+      new_order = Order.create(customer_id: order_hash[selection].customer_id, store_id: order_hash[selection].store_id, price: order_hash[selection].price, product: order_hash[selection].product)
+
+      update_bac()
+
+      order_hash[selection] = new_order
+
       prompt.say("YOUR ORDER HAS BEEN PLACED! PLEASE DRINK RESPONSIBLY!".light_green.bold)
       sleep(1.5)
-      to_search_menu()
+      main_menu()
     else
       to_search_menu()
     end
   end
 
+
   def search_menu
     system "clear"
-    #user.reload
+    show_user_session_details()
     prompt.select("==> WHAT WOULD YOU LIKE TO SEARCH BY?".light_green.bold) do |menu|
       menu.choice "SEARCH BY ZIP CURRENT CODE", -> {zip_search()}
       menu.choice "SEARCH BY LIQUOR", -> {liquor_search()}
       menu.choice "BACK", -> {main_menu()}
     end
   end
+
 
   def delete_account
     confirm_destroy = prompt.yes?("==> ARE YOU SURE?".red.bold)
@@ -195,6 +220,7 @@ class Interface
       main_menu()
     end
   end
+
 
   def zip_search
     customer_zip = customer[:zip]
@@ -217,6 +243,7 @@ class Interface
     end
   end
 
+
   def find_by_speciality(liquor)
     store_names_by_specialty = Store.where(specialty: liquor).map do |store|
       store.name
@@ -228,14 +255,16 @@ class Interface
     check_out(store)
   end
 
+
   def liquor_search
-    @prompt.select("==> WHAT WOULD YOU LIKE TO DRINK?".light_green.bold) do |menu|
+    prompt.select("==> WHAT WOULD YOU LIKE TO DRINK?".light_green.bold) do |menu|
       menu.choice "VODKA", -> {find_by_speciality("vodka")}
       menu.choice "RUM", -> {find_by_speciality("rum")}
       menu.choice "TEQUILA", -> {find_by_speciality("tequila")}
       menu.choice "BACK", -> {search_menu()}
     end
   end
+
 
   def check_out(store)
     current_store = Store.find_by(name: store)
@@ -244,6 +273,9 @@ class Interface
 
     if confirm
       new_order = Order.create(customer_id: self.customer.id, store_id: current_store.id, price: price, product: current_store.specialty)
+
+      update_bac()
+
       prompt.say("==> THANK YOU FOR PLACING AN ORDER OF #{current_store.specialty} for $#{price} with #{current_store.name}. PLEASE ORDER AGAIN SOON!".upcase.light_green)
 
       sleep(1.5)
@@ -270,8 +302,9 @@ class Interface
     end
   end
 
+
   def to_search_menu
-    prompt.say("==> TAKING YOU BACK TO MAIN MENU...".light_green.bold)
+    prompt.say("==> TAKING YOU BACK TO SEARCH MENU...".light_green.bold)
     sleep(1)
     prompt.say("==> ...".light_green.bold)
     sleep(1)
@@ -280,31 +313,52 @@ class Interface
     search_menu()
   end
 
+
+  def to_main_menu
+    prompt.say("==> TAKING YOU BACK TO MAIN MENU...".light_green.bold)
+    sleep(1)
+    prompt.say("==> ...".light_green.bold)
+    sleep(1)
+    prompt.say("==> ...".light_green.bold)
+    sleep(1)
+    main_menu()
+  end
+
+
   def rate_store(store)
     rating = prompt.slider("==> PLEASE GIVE THE STORE A RATING".light_green.bold, max: 10, step: 1, default: 5)
     store.update(rating: rating)
     prompt.say("==> THANK YOU FOR RATING #{store.name}".upcase.light_green.bold)
 
     sleep(1.5)
-    to_search_menu()
+    to_main_menu()
   end
+
 
   def get_vodka_drinks
     @vodka_drinks.random_five_drinks()
   end
 
+
   def get_rum_drinks
     @rum_drinks.random_five_drinks()
   end
+
 
   def get_tequila_drinks
     @tequila_drinks.random_five_drinks()
   end
 
-  # def get_drinks(alcohol)
-  #   method_name = "@#{alcohol}_drinks"
-  #   "#{method_name}".random_five_drinks()
-  # end
+  def update_bac
+    current_bac = @customer.bac #.round(2)
+    @customer.update(bac: current_bac + 0.33)
+  end
+
+
+  def show_user_session_details
+    prompt.say("| USER: #{@customer.name} |               | BAC: #{@customer.bac} |".underline.magenta)
+  end
+
 
   def exit_program
     #fork{ exec "killall", "afplay" }
