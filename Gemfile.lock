@@ -1,6 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    RubyDataStructures (1.1.0)
     activemodel (5.2.3)
       activesupport (= 5.2.3)
     activerecord (5.2.3)
@@ -102,6 +103,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  RubyDataStructures
   catpix
   colorize
   docopt
